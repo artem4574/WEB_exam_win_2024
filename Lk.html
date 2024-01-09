@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Личный кабинет</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="codeLk.js"></script>
+    <link rel="stylesheet" href="styleforLk.css">
+</head>
+
+<body>
+    <header class="border-bottom">
+        <div class="container-fluid py-3">
+            <div class="row align-items-center">
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <img src="logo.png" alt="" class="img-fluid" width="200">
+                </div>
+                <div class="col-md-6">
+                    <ul class="nav justify-content-center">
+                        <li class="nav-item fs-3"><a href="index.html" class="nav-link link px-2">На главную</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section id = "routesTable">
+        <div class="container table-responsive" id="tableroutes">
+            <h2 class="text-center mt-5">Оставленные заявки</h2>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col" class="col-1 col-xl-1">№</th>
+                        <th scope="col" class="col-1 col-xl-1">Название маршрута</th>
+                        <th scope="col" class="col-1 col-xl-1">Дата</th>
+                        <th scope="col" class="col-1 col-xl-1">Стоимость</th>
+                        <th scope="col" class="col-1 col-xl-1"></th>
+                    </tr>
+                </thead>
+                <tbody id="routes-table-body">
+                    <!-- Статические данные -->
+                    <tr>
+                        <td>1</td>
+                        <td>Маршрут 1</td>
+                        <td>2023-01-15</td>
+                        <td>700</td>
+                        <td>
+                            <button type="button" class="btn btn-secondary" onclick="openModal()">
+                                <span class="bi bi-eye-fill"></span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="openEditModal()">
+                                <span class="bi bi-pencil-fill"></span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="openDeleteModal()">
+                                <span class="bi bi-trash-fill"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Маршрут 2</td>
+                        <td>2023-05-28</td>
+                        <td>850</td>
+                        <td>
+                            <button onclick="openModal()">Открыть модальное окно</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Информация об экскурсии</h2>
+            <p><strong id="fio">ФИО Гида:</strong></p>
+            <p><strong id="route">Название маршрута:</strong></p>
+            <p><strong id="dataEcs">Дата экскурсии:</strong></p>
+            <p><strong id="timeEcs">Время начала:</strong></p>
+            <p><strong id="durationEcs">Длительность экскурсии:</strong></p>
+            <p><strong id="PeoplesCnt">Количество человек:</strong></p>
+            <h3>Подзаголовок</h3>
+            <p><strong id="Funct">Название опции:</strong> опции</p>
+            <p><strong>Стоимость:</strong> число</p>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Редактировать данные</h2>
+            <label for="editFIO">ФИО Гида:</label>
+            <input type="text" id="editFIO">
+            <label for="editRoute">Название маршрута:</label>
+            <input type="text" id="editRoute">
+            <label for="editDataEcs">Дата экскурсии:</label>
+            <input type="date" id="editDataEcs">
+            <label for="editTimeEcs">Время начала:</label>
+            <input type="time" id="editTimeEcs">
+            <label for="editDurationEcs">Длительность экскурсии:</label>
+            <input type="time" id="editDurationEcs">
+            <label for="editPeopleCnt">Количество человек:</label>
+            <input type="number" id="editPeopleCnt">
+            <button onclick="saveChanges()">Сохранить изменения</button>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+            <h2>Удаление данных</h2>
+            <p>Вы уверены, что хотите удалить заявку?</p>
+            <button onclick="deleteRow(this)">Удалить</button>
+            <button id="peredumal" onclick="closeDeleteModal()">Я передумал</button>
+        </div>
+    </div>
+    
+    <footer class="text-body-secondary bg-dark-subtle py-5 mt-3 text-center">
+        <div class="container">
+            <p class="float-end mb-1">
+                <a class="link" href="#">Вверх</a>
+            </p>
+            <p class="mb-1">&copy MoscowTour</p>
+            <p class="mb-1">Контакты: +7(972)356-23-11</p>
+        </div>
+    </footer>
+</body>
+
+</html>
