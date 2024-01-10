@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoscowTour</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+        integrity= "sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+        integrity=  "sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" rossorigin="anonymous"> 
+    </script> 
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -19,8 +22,8 @@
                 <div class="col-md-6">
                     <ul class="nav justify-content-center">
                         <li class="nav-item fs-3"><a href="#brand" class="nav-link link px-2">О нас</a></li>
-                        <li class="nav-item fs-3"><a href="#about" class="nav-link link px-2">Достоинства</a></li>
-                        <li class="nav-item fs-3"><a href="#routes" class="nav-link link px-2">Маршруты</a></li>
+                        <li class="nav-item fs-3"><a href="#about" class="nav-link link px-2">Почему мы?</a></li>
+                        <li class="nav-item fs-3"><a href="#routes" class="nav-link link px-2">Наши экскурсии</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3 text-md- align-items-center">
@@ -37,17 +40,11 @@
                 <div class="container">
                     <div class="accent-50 rounded p-5 align-items-center">
                         <h1>MoscowTour</h1>
-                        <p class="fs-5">Наша компания – это ведущий
-                            оператор по организации туристических
-                            маршрутов и экскурсий по Москве и России. Мы
-                            специализируемся на предоставлении
-                            качественных услуг в сфере туризма.</p>
-                        <p class="fs-5">Мы предлагаем широкий выбор
-                            туров, включая индивидуальные и групповые
-                            экскурсии, корпоративные мероприятия, туры
-                            для школьников и студентов, а также
-                            специальные программы для иностранных
-                            туристов.</p>
+                        <p class="fs-5">Откройте для себя магию Москвы с нашей компанией! 
+                            Мы создаем незабываемые путешествия, раскрывая перед вами тайны и красоты столицы России. 
+                            Индивидуальные маршруты, профессиональные гиды и уникальные впечатления ждут вас на каждом шаге пути. 
+                            Погрузитесь в историю, ощутите атмосферу и наслаждайтесь каждым моментом вашего увлекательного открытия Москвы с нами!
+                        </p>
                     </div>
                 </div>
             </section>
@@ -173,9 +170,9 @@
                             <tr>
                                 <th scope="col"></th>
                                 <th scope="col">ФИО</th>
-                                <th scope="col">Языки</th>
-                                <th scope="col">Опыт работы</th>
-                                <th scope="col">Стоимость</th>
+                                <th scope="col">Язык</th>
+                                <th scope="col">Стаж</th>
+                                <th scope="col">Цена</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -204,7 +201,7 @@
                                 <div id="modal-errors"></div>
                                 <form class="row">
                                     <div class="col-12">
-                                        <p>ФИО гида: <b id="fullname"></b></p>
+                                        <p>Экскурсовод: <b id="fullname"></b></p>
                                     </div>
                                     <div class="col-12">
                                         <p>Название маршрута: <b id="route-name"></b></p>
@@ -212,12 +209,12 @@
                                     <div class="col-12">
                                         <div class="row">
                                             <div class="col-6">
-                                                <label class="form-label" for="date">Дата экскурсии</label>
+                                                <label class="form-label" for="date">Дата</label>
                                                 <input id="date" name="date" class="form-control" type="date">
                                             </div>
                                             <div class="col-6">
                                                 <label class="form-label" for="time">Время начала</label>
-                                                <input id="time" name="time" class="form-control" type="time" value="9:00">
+                                                <input id="time" name="time" class="form-control" type="time" value="09:00">
                                             </div>
                                             <div class="col-6">
                                                 <label class="form-label" for="duration">Длительность экскурсии</label>
@@ -228,7 +225,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-6">
-                                                <label class="form-label" for="count">Количество человек</label>
+                                                <label class="form-label" for="count">Количество участников</label>
                                                 <input id="count" name="count" class="form-control" type="number" value="1" min="1" max="20">
                                             </div>
                                         </div>
@@ -262,7 +259,7 @@
         </section>
     </main>
 
-    <footer class="text-body-secondary bg-dark-subtle py-5 mt-3">
+    <footer class="text-body-secondary bg-body-secondary py-5 mt-3">
         <div class="container">
             <p class="float-end mb-1">
                 <a class="link" href="#">Вверх</a>
