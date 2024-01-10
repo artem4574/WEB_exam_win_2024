@@ -1,3 +1,11 @@
+'use-strict'
+
+function getURL(path) {
+    let url = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/${path}`);
+    url.searchParams.set("api_key", "64f8482f-218a-424a-bc2f-1eb33bd034fd");
+    return url;
+}
+
 function renderRoutes(data, page = 4) {
     let tableHTML = "";
     page = page - 1;
@@ -69,10 +77,4 @@ function deleteRow() {
     var row = document.getElementById('rowNumber');
     row.parentNode.removeChild(row);
     closeDeleteModal();
-}
-
-window.onload = onLoad;
-
-function onLoad() {
-    getRoutes();
 }
