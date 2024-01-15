@@ -17,15 +17,15 @@ const Actions = {
         header.innerHTML = `Доступные гиды по маршруту ${item.name}`;
         await Data.getGuides(item.id);
         searchedGuides = [];
-        showGuide();
+        renderGuideList();
         setLanguage();
-        showOrder();
+        displayReservation();
     },
     guideBtnHandler(item, tableRow) {
         State.selectedGuide = item;
         UI.clearSelection('guideTable');
         tableRow.classList.add('table-secondary');
-        showOrder();
+        displayReservation();
     },
     findRoute(form) {
         let items = JSON.parse(sessionStorage.getItem('routes'));
@@ -41,7 +41,7 @@ const Actions = {
             searched = searched.filter(item => item.mainObject.includes(select));
         }
         sessionStorage.setItem('searched-routes', JSON.stringify(searched));
-        showRoute(1);
+        renderRoute(1);
     },
     findGuide(form) {
         let items = JSON.parse(sessionStorage.getItem('guides'));
@@ -63,7 +63,7 @@ const Actions = {
         if (searched.length === 0) {
             dispErr(document.querySelector('.guide-error-block'), 'Подходящие гиды не найдены, выведены доступные гиды');
         }
-        showGuide();
+        renderGuideList();
     }
 }
 
@@ -86,7 +86,7 @@ const Data = {
                 routes.push(item);
             }
             sessionStorage.setItem('routes', JSON.stringify(routes));
-            showRoute(1);
+            renderRoute(1);
         } catch (error) {
             console.error('Error fetching routes:', error);
         }
@@ -136,175 +136,160 @@ function setLanguage() {
     }
 }
 
-function showOrder() {
-    let ordereBlock = document.getElementById('order');
+function displayReservation() {
+    let reservationSection = document.getElementById('order');
     if (State.selectedRoute === undefined || State.selectedGuide === undefined) {
-        ordereBlock.classList.add('hide');
-    }
-    else {
-        ordereBlock.classList.remove('hide');
+        reservationSection.classList.add('hide');
+    } else {
+        reservationSection.classList.remove('hide');
     }
 }
 
-function showGuide() {
-    let table = document.getElementById('guideTable');
-    let items = searchedGuides;
-    if (items == undefined || items.length == 0) {
-        items = JSON.parse(sessionStorage.getItem('guides'));
+function renderGuideList() {
+    let guideTable = document.getElementById('guideTable');
+    let guideItems = searchedGuides;
+    if (guideItems === undefined || guideItems.length === 0) {
+        guideItems = JSON.parse(sessionStorage.getItem('guides'));
     }
-    table.innerHTML = '';
-    for (let i = 0; i < items.length; i++) {
-        let tr = document.createElement('tr');
-        if (State.selectedGuide != undefined && items[i].id == State.selectedGuide.id) {
-            tr.classList.add('table-secondary');
+    guideTable.innerHTML = '';
+
+    for (let index = 0; index < guideItems.length; index++) {
+        let row = document.createElement('tr');
+        if (State.selectedGuide !== undefined && guideItems[index].id === State.selectedGuide.id) {
+            row.classList.add('table-secondary');
         }
-        let img = document.createElement('th');
-        let icon = document.createElement('i');
-        icon.classList.add('bi');
-        icon.classList.add('bi-person-circle');
-        img.append(icon);
-        tr.append(img);
 
-        let name = document.createElement('th');
-        name.innerHTML = items[i].name;
-        tr.append(name);
+        let thumbnailCell = document.createElement('th');
+        let avatarIcon = document.createElement('i');
+        avatarIcon.classList.add('bi', 'bi-person-circle');
+        thumbnailCell.append(avatarIcon);
+        row.append(thumbnailCell);
 
-        let language = document.createElement('td');
-        language.innerHTML = items[i].language;
-        tr.append(language);
+        let nameCell = document.createElement('th');
+        nameCell.textContent = guideItems[index].name;
+        row.append(nameCell);
 
-        let workExperience = document.createElement('td');
-        workExperience.innerHTML = items[i].workExperience;
-        tr.append(workExperience);
+        let languageCell = document.createElement('td');
+        languageCell.textContent = guideItems[index].language;
+        row.append(languageCell);
 
-        let price = document.createElement('td');
-        price.innerHTML = items[i].pricePerHour + ' руб/час';
-        tr.append(price);
+        let experienceCell = document.createElement('td');
+        experienceCell.textContent = guideItems[index].workExperience;
+        row.append(experienceCell);
 
-        let buttonTd = document.createElement('td');
-        let button = document.createElement('button');
-        button.innerHTML = 'Выбрать';
-        button.classList.add('btn');
-        button.classList.add('primary');
-        button.classList.add('text-white');
-        button.onclick = () => {
-            Actions.guideBtnHandler(items[i], tr);
+        let rateCell = document.createElement('td');
+        rateCell.textContent = guideItems[index].pricePerHour + ' руб/час';
+        row.append(rateCell);
+
+        let actionCell = document.createElement('td');
+        let selectButton = document.createElement('button');
+        selectButton.textContent = 'Выбрать';
+        selectButton.classList.add('btn', 'text-white');
+        selectButton.onclick = function () {
+            Actions.guideBtnHandler(guideItems[index], row);
         };
-        buttonTd.append(button);
-        tr.append(buttonTd);
-        table.append(tr);
+        actionCell.append(selectButton);
+        row.append(actionCell);
+        guideTable.append(row);
     }
 }
 
-function showPag(page) {
-    let pages = document.querySelector('.pagination');
-    pages.innerHTML = '';
-    let licreate = document.createElement('li');
-    licreate.classList.add('page-item');
-    let Link = document.createElement('a');
-    Link.innerHTML = 'Первая страница';
-    Link.classList.add('page-link');
-    Link.classList.add('link');
-    Link.onclick = () => {
-        showRoute(1);
-    };
+function displayPagination(currentPage) {
+    let paginationContainer = document.querySelector('.pagination');
+    paginationContainer.innerHTML = '';
 
-    licreate.append(Link);
-    pages.append(licreate);
-    let items = getRouteFromStorage();
-    let start = Math.max(page - 2, 1);
-    let last = Math.ceil(items.length / State.guidesPerPage);
-    let end = Math.min(page + 2, last);
+    function createPageItem(content, pageNumber = null) {
+        let pageElement = document.createElement('li');
+        pageElement.classList.add('page-item');
 
-    for (let i = start; i <= end; i++) {
-        let li = document.createElement('li');
-        li.classList.add('page-item');
-        let link = document.createElement('a');
-        link.innerHTML = i;
-        link.classList.add('page-link');
-        link.classList.add('link');
-        link.onclick = () => {
-            showRoute(i);
-        };
-        li.append(link);
-        if (i) {
-            link.classList.add('text-white');
-            link.classList.add('primary');
+        let pageLink = document.createElement('a');
+        pageLink.innerHTML = content;
+        pageLink.classList.add('page-link', 'link');
+
+        if (pageNumber !== null) {
+            pageLink.onclick = () => showRoute(pageNumber);
+
+            if (pageNumber === currentPage) {
+                pageLink.classList.add('text-white', 'primary');
+            }
         }
-        pages.append(li)
+
+        pageElement.append(pageLink);
+        return pageElement;
     }
 
-    let li = document.createElement('li');
-    li.classList.add('page-item');
-    let link = document.createElement('a');
-    link.innerHTML = 'Последняя страница';
-    link.classList.add('page-link');
-    link.classList.add('link');
-    link.onclick = () => {
-        showRoute(last);
-    };
-    li.append(link);
-   pages.append(li)
-}
+    paginationContainer.append(createPageItem('Первая страница', 1));
 
-function getRouteFromStorage() {
-    let items = JSON.parse(sessionStorage.getItem('searched-routes'));
-    if (items == undefined) {
-        items = JSON.parse(sessionStorage.getItem('routes'));
+    let routes = retrievePathFromSession();
+    let totalPages = Math.ceil(routes.length / State.guidesPerPage);
+    let startPage = Math.max(currentPage - 2, 1);
+    let endPage = Math.min(currentPage + 2, totalPages);
+
+    for (let i = startPage; i <= endPage; i++) {
+        paginationContainer.append(createPageItem(i, i));
     }
-    return items;
+    paginationContainer.append(createPageItem('Последняя страница', totalPages));
 }
 
-function showRoute(page) {
-    let table = document.getElementById('routeTableBody');
-    let items = getRouteFromStorage();
-    showPag(page);
-    table.innerHTML = '';
+
+function retrievePathFromSession() {
+    let cachedPaths = JSON.parse(sessionStorage.getItem('searched-routes'));
+    if (cachedPaths === null) {
+        cachedPaths = JSON.parse(sessionStorage.getItem('routes'));
+    }
+    return cachedPaths;
+}
+
+function renderRoute(page) {
+    let routeList = document.getElementById('routeTableBody');
+    let routeItems = retrievePathFromSession();
+    displayPagination(page);
+    routeList.innerHTML = '';
     UI.clearSelection('routeTableBody');
-    let end = Math.min(page * State.guidesPerPage, items.length);
-    for (let i = (page - 1) * State.guidesPerPage; i < end; i++) {
-        let tr = document.createElement('tr');
-        if (State.selectedRoute != undefined && items[i].id == State.selectedRoute.id) {
-            tr.classList.add('table-secondary');
+    let pageLimit = Math.min(page * State.guidesPerPage, routeItems.length);
+
+    for (let index = (page - 1) * State.guidesPerPage; index < pageLimit; index++) {
+        let row = document.createElement('tr');
+
+        if (State.selectedRoute != undefined && routeItems[index].id == State.selectedRoute.id) {
+            row.classList.add('highlight');
         }
 
-        let name = document.createElement('th');
-        name.innerHTML = items[i].name;
-        tr.append(name);
+        let routeNameCell = document.createElement('th');
+        routeNameCell.textContent = routeItems[index].name;
+        row.appendChild(routeNameCell);
 
-        let descr = document.createElement('td');
-        descr.innerHTML = items[i].description;
-        tr.append(descr);
+        let routeDescrCell = document.createElement('td');
+        routeDescrCell.textContent = routeItems[index].description;
+        row.appendChild(routeDescrCell);
 
-        let obj = document.createElement('td');
-        obj.innerHTML = items[i].mainObject;
-        tr.append(obj);
+        let mainAttractionCell = document.createElement('td');
+        mainAttractionCell.textContent = routeItems[index].mainObject;
+        row.appendChild(mainAttractionCell);
 
-        let buttonTd = document.createElement('td');
-        let button = document.createElement('button');
-        button.innerHTML = 'Выбрать';
-        button.classList.add('btn');
-        button.classList.add('primary');
-        button.classList.add('text-white');
-        button.onclick = () => {
-            Actions.RouteButtonHandler(items[i], tr);
+        let selectButtonCell = document.createElement('td');
+        let selectButton = document.createElement('button');
+        selectButton.textContent = 'Выбрать';
+        selectButton.classList.add('btn', 'primary', 'text-white');
+        selectButton.onclick = () => {
+            Actions.RouteButtonHandler(routeItems[index], row);
         };
-        buttonTd.append(button);
-        tr.append(buttonTd);
-        table.append(tr);
+        selectButtonCell.appendChild(selectButton);
+        row.appendChild(selectButtonCell);
+        routeList.appendChild(row);
     }
 }
 
-function setterObj() {
-    let items = JSON.parse(sessionStorage.getItem('routes'));
-    let select = document.getElementById('objects');
-    select.innerHTML = '';
-    let uniqueObjects = ['Любой', ...new Set(items.map(item => item.mainObject))];
-    for (let obj of uniqueObjects) {
-        let option = document.createElement("option");
-        option.innerHTML = obj;
-        option.setAttribute("value", obj);
-        select.appendChild(option);
+function initializeObjectSelector() {
+    const routeData = JSON.parse(sessionStorage.getItem('routes'));
+    const selectorElement = document.getElementById('objects');
+    selectorElement.innerHTML = '';
+    const distinctObjects = ['Любой', ...new Set(routeData.map(route => route.mainObject))];
+    for (let currentObject of distinctObjects) {
+        const selectionOption = document.createElement("option");
+        selectionOption.textContent = currentObject; 
+        selectionOption.value = currentObject;
+        selectorElement.appendChild(selectionOption);
     }
 }
 
@@ -329,97 +314,131 @@ function getKbyDate(date) {
     return checkDay ? 1.5 : 1;
 }
 
-function formUpd(modal) {
-    let duration = modal.target.querySelector('#duration').value;
-    let count = modal.target.querySelector('#count').value;
-    let time = modal.target.querySelector('#time').value;
-    let date = modal.target.querySelector('#date').value;
-    let option1 = modal.target.querySelector('#option1').checked;
-    let option2 = modal.target.querySelector('#option2').checked;
-    let btn = modal.target.querySelector('#modal-submit');
-    let hour = +time.split(':')[0];
-    let minutes = +time.split(':')[1];
-    if (!(hour >= 9 && hour <= 23 && (minutes == 0 || minutes == 30))) {
-        dispErr(modal.target.querySelector('#modal-errors'), 'Доступно только время с 9 до 23 часов, каждые 30 минут!');
-        btn.classList.add('disabled');
+function updateForm(dialog) {
+    let timeSpan = dialog.target.querySelector('#duration').value;
+    let visitorCount = dialog.target.querySelector('#count').value;
+    let selectedTime = dialog.target.querySelector('#time').value;
+    let chosenDate = dialog.target.querySelector('#date').value;
+    let additionalOption1 = dialog.target.querySelector('#option1').checked;
+    let additionalOption2 = dialog.target.querySelector('#option2').checked;
+    let submitButton = dialog.target.querySelector('#modal-submit');
+    let selectedHour = +selectedTime.split(':')[0];
+    let selectedMinutes = +selectedTime.split(':')[1];
+    let errorContainer = dialog.target.querySelector('#modal-errors');
+   
+    if (!(selectedHour >= 9 && selectedHour <= 23 && (selectedMinutes == 0 || selectedMinutes == 30))) {
+        dispErr(errorContainer, 'Доступно только время с 9 до 23 часов, каждые 30 минут!');
+        submitButton.classList.add('disabled');
         return;
     }
-    if (date == '' || time == '') {
-        dispErr(modal.target.querySelector('#modal-errors'), 'Необходимо указать время и дату!');
-        btn.classList.add('disabled');
+    if (chosenDate == '' || selectedTime == '') {
+        dispErr(errorContainer, 'Необходимо указать время и дату!');
+        submitButton.classList.add('disabled');
         return;
     }
     
-    let isThisDayOff = getKbyDate(date);
-    let morningPrice = hour >= 9 || hour < 12 ? 400 : 0;
-    let eveningPrice = hour >= 20 || hour < 23 ? 1000 : 0;
-    let visitorsPrice = count < 5 ? 0 : count < 10 ? 1000 : 1500;
-    let option1Price = option1 ? 0.3 : 0;
-    let option2Price = option2 ? (isThisDayOff == 1.5) ? 0.25 : 0.3 : 0;
-    btn.classList.remove('disabled');
-    let price = State.selectedGuide.pricePerHour * duration * (option1Price + isThisDayOff + option2Price) + morningPrice + eveningPrice + visitorsPrice ;
-    price = Math.round(price);
-    modal.target.querySelector('#price').innerHTML = price;
-    btn.onclick = async () => {
-        let form = new FormData();
-        form.append('guide_id', State.selectedGuide.id);
-        form.append('route_id', State.selectedRoute.id);
-        form.append('date', date);
-        form.append('time', time);
-        form.append('duration', duration);
-        form.append('persons', count);
-        form.append('price', price);
-        form.append('optionFirst', +option1);
-        form.append('optionSecond', +option2);
-        try {
-            let url = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/${'orders'}`);
-            url.searchParams.set("api_key", "64f8482f-218a-424a-bc2f-1eb33bd034fd");
-            let response = await fetch(url, {
-                method: 'POST',
-                body: form
-            });
+    let holidayMultiplier = getKbyDate(chosenDate);
+    let morningExtraCharge = (selectedHour >= 9 && selectedHour < 12) ? 400 : 0;
+    let eveningExtraCharge = (selectedHour >= 20 && selectedHour < 23) ? 1000 : 0;
+    let largeGroupExtraCharge = visitorCount < 5 ? 0 : visitorCount < 10 ? 1000 : 1500;
+    let option1ExtraRate = additionalOption1 ? 0.3 : 0;
+    let option2ExtraRate = additionalOption2 ? (holidayMultiplier == 1.5) ? 0.25 : 0.3 : 0;
+    submitButton.classList.remove('disabled');
+    let finalPrice = calculatePrice(State.selectedGuide.pricePerHour, timeSpan, holidayMultiplier, option1ExtraRate, option2ExtraRate, morningExtraCharge, eveningExtraCharge, largeGroupExtraCharge);
+    dialog.target.querySelector('#price').textContent = finalPrice;
+    setupFormSubmission(submitButton, {
+        guideId: State.selectedGuide.id,
+        routeId: State.selectedRoute.id,
+        date: chosenDate,
+        time: selectedTime,
+        duration: timeSpan,
+        numberPersons: visitorCount,
+        totalPrice: finalPrice,
+        firstOption: additionalOption1,
+        secondOption: additionalOption2
+    });
+}
 
+function calculatePrice(rate, duration, holidayRate, option1Rate, option2Rate, morningCharge, eveningCharge, groupCharge) {
+    let initialPrice = rate * duration * (1 + option1Rate + option2Rate + holidayRate);
+    let totalPrice = initialPrice + morningCharge + eveningCharge + groupCharge;
+    return Math.round(totalPrice);
+}
+
+function setupFormSubmission(button, formDataValues) {
+    button.onclick = async () => {
+        let form = new FormData();
+        form.append('guide_id', formDataValues.guideId);
+        form.append('route_id', formDataValues.routeId);
+        form.append('date', formDataValues.date);
+        form.append('time', formDataValues.time);
+        form.append('duration', formDataValues.duration);
+        form.append('persons', formDataValues.numberPersons);
+        form.append('price', formDataValues.totalPrice);
+        form.append('option1', +formDataValues.firstOption);
+        form.append('option2', +formDataValues.secondOption);
+        let errorContainer = document.querySelector('#modal-errors');
+
+        try {
+            let orderUrl = new URL('http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/orders');
+            orderUrl.searchParams.set("api_key", "64f8482f-218a-424a-bc2f-1eb33bd034fd");
+            let response = await sendForm(orderUrl, form);
             if (!response.ok) {
-                dispErr(modal.target.querySelector('#modal-errors'), 'Ошибка сервера!');
+                dispErr(errorContainer, 'Ошибка сервера!');
             } else {
                 document.querySelector('#modal-close').click();
-                btn.classList.remove('disabled');
+                button.classList.remove('disabled');
             }
         } catch (error) {
             console.error('Error submitting the form:', error);
-            dispErr(modal.target.querySelector('#modal-errors'), 'Ошибка при отправке заказа!');
-        }
+            dispErr(errorContainer, 'Ошибка при отправке заказа!');
+        }  
     };
 }
 
+async function sendForm(url, formData) {
+    return fetch(url, {
+        method: 'POST',
+        body: formData
+    });
+}
+
+
 window.onload = async () => {
     await Data.getRoute();
-    setterObj();
-    let routesForm = document.getElementById('routes-form');
-    routesForm.onsubmit = (event) => {
-        event.preventDefault();
-        Actions.findRoute(routesForm);
-    };
-    let select = document.getElementById('objects');
-    select.onchange = function () {
-        Actions.findRoute(routesForm);
-    }
-    let guideForm = document.getElementById('guide-form');
-    guideForm.onsubmit = (event) => {
-        event.preventDefault();
-        Actions.findGuide(guideForm);
-    };
-    document.getElementById('orderModal').addEventListener('show.bs.modal', function (event) {
-        event.target.querySelector('#fullname').innerHTML = State.selectedGuide.name;
-        event.target.querySelector('#route-name').innerHTML = State.selectedRoute.name;
-        event.target.querySelector('#time').value = '09:00';
-        event.target.querySelector('#date').value = Date.now();
+    initializeObjectSelector();
 
-        event.target.querySelector('#duration').onchange = () => formUpd(event);
-        event.target.querySelector('#count').oninput = () => formUpd(event);
-        event.target.querySelector('#time').onchange = () => formUpd(event);
-        event.target.querySelector('#date').onchange = () => formUpd(event);
-        event.target.querySelector('#option1').onchange = () => formUpd(event);
-        event.target.querySelector('#option2').onchange = () => formUpd(event);
+    let formRoutes = document.getElementById('routes-form');
+    formRoutes.onsubmit = (e) => {
+        e.preventDefault();
+        Actions.findRoute(formRoutes);
+    };
+
+    let objectSelectElement = document.getElementById('objects');
+    objectSelectElement.onchange = () => {
+        Actions.findRoute(formRoutes);
+    };
+
+    let formGuide = document.getElementById('guide-form');
+    formGuide.onsubmit = (e) => {
+        e.preventDefault();
+        Actions.findGuide(formGuide);
+    };
+
+    document.getElementById('orderModal').addEventListener('show.bs.modal', function (modalEvent) {
+        let modal = modalEvent.target;
+        modal.querySelector('#fullname').textContent = State.selectedGuide.name;
+        modal.querySelector('#route-name').textContent = State.selectedRoute.name;
+        modal.querySelector('#time').value = '09:00';
+        modal.querySelector('#date').value = Date.now();
+
+        const updateModalForm = (updateEvent) => updateForm(updateEvent);
+
+        modal.querySelector('#duration').onchange = updateModalForm;
+        modal.querySelector('#count').oninput = updateModalForm;
+        modal.querySelector('#time').onchange = updateModalForm;
+        modal.querySelector('#date').onchange = updateModalForm;
+        modal.querySelector('#option1').onchange = updateModalForm;
+        modal.querySelector('#option2').onchange = updateModalForm;
     });
 }
