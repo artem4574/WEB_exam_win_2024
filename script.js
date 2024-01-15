@@ -1,4 +1,4 @@
-'use strict';
+'use-strict'
 
 let currentPage = 1;
 let perPage = 5;
@@ -6,18 +6,18 @@ let selectedRoute;
 let selectedGuide;
 let searchedGuides;
 
-function clearSelection(name) {
+function clearSelect(name) {
     let table = document.getElementById(name);
     for (let row of table.children) {
         row.classList.remove('table-secondary');
     }
 }
 
-function setLanguages() {
+function setLanguage() {
     let items = JSON.parse(sessionStorage.getItem('guides'));
     let select = document.getElementById('languages');
     select.innerHTML = '';
-    let uniqueLanguages = ['Any', ...new Set(items.map(item => item.language))];
+    let uniqueLanguages = ['Любой', ...new Set(items.map(item => item.language))];
     for (let language of uniqueLanguages) {
         let option = document.createElement("option");
         option.innerHTML = language;
@@ -27,16 +27,16 @@ function setLanguages() {
 }
 
 function showOrder() {
-    let orderBlock = document.getElementById('order');
+    let ordereBlock = document.getElementById('order');
     if (selectedRoute === undefined || selectedGuide === undefined) {
-        orderBlock.classList.add('hide');
+        ordereBlock.classList.add('hide');
     }
     else {
-        orderBlock.classList.remove('hide');
+        ordereBlock.classList.remove('hide');
     }
 }
 
-async function fetchRoutes() {
+async function getRoute() {
     try {
         let url = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/${'routes'}`);
         url.searchParams.set("api_key", "64f8482f-218a-424a-bc2f-1eb33bd034fd");
@@ -44,21 +44,21 @@ async function fetchRoutes() {
         let routes = [];
         let items = await response.json();
         for (let i = 0; i < items.length; i++) {
-            let route = {};
-            route['id'] = items[i].id;
-            route['name'] = items[i].name;
-            route['description'] = items[i].description;
-            route['mainObject'] = items[i].mainObject;
-            routes.push(route);
+            let item = {};
+            item['id'] = items[i].id;
+            item['name'] = items[i].name;
+            item['description'] = items[i].description;
+            item['mainObject'] = items[i].mainObject;
+            routes.push(item);
         }
         sessionStorage.setItem('routes', JSON.stringify(routes));
-        showRouteTable(1);
+        showRoute(1);
     } catch (error) {
         console.error('Error fetching routes:', error);
     }
 }
 
-function getGuidesArray() {
+function getGuid() {
     let items = searchedGuides;
     if (items == undefined || items.length == 0) {
         items = JSON.parse(sessionStorage.getItem('guides'));
@@ -66,31 +66,31 @@ function getGuidesArray() {
     return items;
 }
 
-async function handleRouteButtonClick(item, tableRow) {
+async function RouteButtonHandler(item, tableRow) {
     selectedRoute = item;
-    clearSelection('routeTableBody');
+    clearSelect('routeTableBody');
     tableRow.classList.add('table-secondary');
     let guides = document.getElementById('guide');
     guides.classList.remove('hide');
     let header = document.querySelector('.guide-route');
     header.innerHTML = `Доступные гиды по маршруту ${item.name}`;
-    await fetchGuides(item.id);
+    await getGuides(item.id);
     searchedGuides = [];
-    showGuideTable();
-    setLanguages();
+    showGuide();
+    setLanguage();
     showOrder();
 }
 
-function handleGuideButtonClick(item, tableRow) {
+function guideBtnHandler(item, tableRow) {
     selectedGuide = item;
-    clearSelection('guideTable');
+    clearSelect('guideTable');
     tableRow.classList.add('table-secondary');
     showOrder();
 }
 
-function showGuideTable() {
+function showGuide() {
     let table = document.getElementById('guideTable');
-    let items = getGuidesArray();
+    let items = getGuid();
     table.innerHTML = '';
     for (let i = 0; i < items.length; i++) {
         let tr = document.createElement('tr');
@@ -127,7 +127,7 @@ function showGuideTable() {
         button.classList.add('primary');
         button.classList.add('text-white');
         button.onclick = () => {
-            handleGuideButtonClick(items[i], tr);
+            guideBtnHandler(items[i], tr);
         };
         buttonTd.append(button);
         tr.append(buttonTd);
@@ -135,15 +135,15 @@ function showGuideTable() {
     }
 }
 
-async function fetchGuides(routeId) {
-    let url = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/${`routes/${routeId}/guides`}`);
+async function getGuides(id) {
+    let url = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/${`routes/${id}/guides`}`);
     url.searchParams.set("api_key", "64f8482f-218a-424a-bc2f-1eb33bd034fd");
     let response = await fetch(url);
     let items = await response.json();
     sessionStorage.setItem('guides', JSON.stringify(items));
 }
 
-function createListItem(name, value, active) {
+function liCreate(name, value, active) {
     let li = document.createElement('li');
     li.classList.add('page-item');
     let link = document.createElement('a');
@@ -161,25 +161,25 @@ function createListItem(name, value, active) {
     return li;
 }
 
-function showPagination(page) {
-    let pagination = document.querySelector('.pagination');
-    pagination.innerHTML = '';
+function showPag(page) {
+    let pages = document.querySelector('.pagination');
+    pages.innerHTML = '';
 
-    pagination.append(createListItem('Первая страница', 1));
+    pages.append(liCreate('Первая страница', 1));
 
-    let items = getRoutesFromStorage();
+    let items = getRouteFromStorage();
     let start = Math.max(page - 2, 1);
     let last = Math.ceil(items.length / perPage);
     let end = Math.min(page + 2, last);
 
     for (let i = start; i <= end; i++) {
-        pagination.append(createListItem(i, i, page === i));
+        pages.append(liCreate(i, i, page === i));
     }
 
-    pagination.append(createListItem('Последняя страница', last));
+    pages.append(liCreate('Последняя страница', last));
 }
 
-function getRoutesFromStorage() {
+function getRouteFromStorage() {
     let items = JSON.parse(sessionStorage.getItem('searched-routes'));
     if (items == undefined) {
         items = JSON.parse(sessionStorage.getItem('routes'));
@@ -187,12 +187,12 @@ function getRoutesFromStorage() {
     return items;
 }
 
-function showRouteTable(page) {
+function showRoute(page) {
     let table = document.getElementById('routeTableBody');
-    let items = getRoutesFromStorage();
-    showPagination(page);
+    let items = getRouteFromStorage();
+    showPag(page);
     table.innerHTML = '';
-    clearSelection('routeTableBody');
+    clearSelect('routeTableBody');
     let end = Math.min(page * perPage, items.length);
     for (let i = (page - 1) * perPage; i < end; i++) {
         let tr = document.createElement('tr');
@@ -219,7 +219,7 @@ function showRouteTable(page) {
         button.classList.add('primary');
         button.classList.add('text-white');
         button.onclick = () => {
-            handleRouteButtonClick(items[i], tr);
+            RouteButtonHandler(items[i], tr);
         };
         buttonTd.append(button);
         tr.append(buttonTd);
@@ -227,7 +227,7 @@ function showRouteTable(page) {
     }
 }
 
-function setObjectOptions() {
+function setterObj() {
     let items = JSON.parse(sessionStorage.getItem('routes'));
     let select = document.getElementById('objects');
     select.innerHTML = '';
@@ -240,7 +240,7 @@ function setObjectOptions() {
     }
 }
 
-function searchRoute(form) {
+function findRoute(form) {
     let items = JSON.parse(sessionStorage.getItem('routes'));
     let search = form.elements['search'].value.trim();
     let select = form.elements['objects'].value;
@@ -254,10 +254,11 @@ function searchRoute(form) {
         searched = searched.filter(item => item.mainObject.includes(select));
     }
     sessionStorage.setItem('searched-routes', JSON.stringify(searched));
-    showRouteTable(1);
+    showRoute(1);
 }
 
-function displayError(block, message) {
+
+function dispErr(block, message) {
     const div = document.createElement('div');
     div.classList.add('alert', 'alert-danger');
     div.textContent = message;
@@ -267,7 +268,7 @@ function displayError(block, message) {
     }, 5000);
 }
 
-function searchGuide(form) {
+function findGuide(form) {
     let items = JSON.parse(sessionStorage.getItem('guides'));
     let languages = form.elements['languages'].value;
     let from = +form.elements['xpFrom'].value;
@@ -279,15 +280,15 @@ function searchGuide(form) {
         searched = [...items];
     }
     if (from >= to) {
-        displayError(document.querySelector('.guide-error-block'), 'Значение ОТ должно быть меньше ДО');
+        dispErr(document.querySelector('.guide-error-block'), 'Значение ОТ должно быть меньше ДО');
     } else {
         searched = searched.filter(item => item.workExperience >= from && item.workExperience <= to);
     }
     searchedGuides = searched;
     if (searched.length === 0) {
-        displayError(document.querySelector('.guide-error-block'), 'Подходящие гиды не найдены, выведены доступные гиды');
+        dispErr(document.querySelector('.guide-error-block'), 'Подходящие гиды не найдены, выведены доступные гиды');
     }
-    showGuideTable();
+    showGuide();
 }
 
 function getKbyDate(date) {
@@ -327,9 +328,9 @@ function formUpd(modal) {
     let eveningPrice = hour >= 20 || hour < 23 ? 1000 : 0;
     let visitorsPrice = count < 5 ? 0 : count < 10 ? 1000 : 1500;
     let option1Price = option1 ? 0.3 : 0;
-    let option2Price = option2 ? (isThisDayOff == 1)? 0.3 : 0.25 : 0;
+    let option2Price = option2 ? (isThisDayOff == 1.5) ? 0.25 : 0.3 : 0;
     btn.classList.remove('disabled');
-    let price = selectedGuide.pricePerHour * duration * (option1Price + isThisDayOff + option2Price) + morningPrice + eveningPrice + visitorsPrice;
+    let price = selectedGuide.pricePerHour * duration * (option1Price + isThisDayOff + option2Price) + morningPrice + eveningPrice + visitorsPrice ;
     price = Math.round(price);
     modal.target.querySelector('#price').innerHTML = price;
     btn.onclick = async () => {
@@ -365,8 +366,8 @@ function formUpd(modal) {
 }
 
 window.onload = async () => {
-    await fetchRoutes();
-    setObjectOptions();
+    await getRoute();
+    setterObj();
     let routesForm = document.getElementById('routes-form');
     routesForm.onsubmit = (event) => {
         event.preventDefault();
