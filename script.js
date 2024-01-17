@@ -425,20 +425,17 @@ window.onload = async () => {
         Actions.findGuide(formGuide);
     };
 
-    document.getElementById('orderModal').addEventListener('show.bs.modal', function (modalEvent) {
-        let modal = modalEvent.target;
-        modal.querySelector('#fullname').textContent = State.selectedGuide.name;
-        modal.querySelector('#route-name').textContent = State.selectedRoute.name;
-        modal.querySelector('#time').value = '09:00';
-        modal.querySelector('#date').value = Date.now();
-
-        const updateModalForm = (updateEvent) => updateForm(updateEvent);
-
-        modal.querySelector('#duration').onchange = updateModalForm;
-        modal.querySelector('#count').oninput = updateModalForm;
-        modal.querySelector('#time').onchange = updateModalForm;
-        modal.querySelector('#date').onchange = updateModalForm;
-        modal.querySelector('#option1').onchange = updateModalForm;
-        modal.querySelector('#option2').onchange = updateModalForm;
-    });
+    document.getElementById('orderModal').addEventListener('show.bs.modal', function (event) {
+    event.target.querySelector('#fullname').innerHTML = State.selectedGuide.name;
+    event.target.querySelector('#route-name').innerHTML = State.selectedRoute.name;
+    event.target.querySelector('#time').value = '09:00';
+    event.target.querySelector('#date').value = Date.now();
+    
+    event.target.querySelector('#duration').onchange = () => updateForm(event);
+    event.target.querySelector('#count').oninput = () => updateForm(event);
+    event.target.querySelector('#time').onchange = () => updateForm(event);
+    event.target.querySelector('#date').onchange = () => updateForm(event);
+    event.target.querySelector('#option1').onchange = () => updateForm(event);
+    event.target.querySelector('#option2').onchange = () => updateForm(event);
+});
 }
