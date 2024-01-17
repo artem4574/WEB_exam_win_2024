@@ -27,6 +27,10 @@ footer {
     color: #C20002;
 }
 
+.hideLine {
+    overflow-x: hidden;
+}
+
 #routes {
      background-color: #ADD8E6;
 }
@@ -48,12 +52,14 @@ footer {
     height: 300px;
     border: 5px solid #515151;
   }
+
   .exmpl {
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
   }
+
   .exmpl img {
     height: 100%;
     width: auto;
@@ -100,4 +106,20 @@ footer {
 
 .fullwrap:hover .fullcap {
   opacity: 1;
+}
+
+@media (max-width: 600px) {
+    .table-responsive {
+        margin: 0;
+        padding: 0;
+    }
+
+    .table {
+        font-size: 10px;
+    }
+
+    .table th,
+    .table td {
+        padding: 0px;
+    }
 }

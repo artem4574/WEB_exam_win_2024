@@ -207,7 +207,7 @@ function displayPagination(currentPage) {
         pageLink.classList.add('page-link', 'link');
 
         if (pageNumber !== null) {
-            pageLink.onclick = () => showRoute(pageNumber);
+            pageLink.onclick = () => renderRoute(pageNumber);
 
             if (pageNumber === currentPage) {
                 pageLink.classList.add('text-white', 'primary');
