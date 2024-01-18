@@ -19,13 +19,13 @@ const Actions = {
         searchedGuides = [];
         renderGuideList();
         setLanguage();
-        displayReservation();
+        UI.displayReservation();
     },
     guideBtnHandler(item, tableRow) {
         State.selectedGuide = item;
         UI.clearSelection('guideTable');
         tableRow.classList.add('table-secondary');
-        displayReservation();
+        UI.displayReservation();
     },
     findRoute(form) {
         let items = JSON.parse(sessionStorage.getItem('routes'));
@@ -55,24 +55,22 @@ const Actions = {
             searched = [...items];
         }
         if (from >= to) {
-            dispErr(document.querySelector('.guide-error-block'), 'Значение ОТ должно быть меньше ДО');
+            UI.dispErr(document.querySelector('.guide-error-block'), 'Значение ОТ должно быть меньше ДО');
         } else {
             searched = searched.filter(item => item.workExperience >= from && item.workExperience <= to);
         }
         searchedGuides = searched;
         if (searched.length === 0) {
-            dispErr(document.querySelector('.guide-error-block'), 'Подходящие гиды не найдены, выведены доступные гиды');
+            UI.dispErr(document.querySelector('.guide-error-block'), 'Подходящие гиды не найдены, выведены доступные гиды');
         }
         renderGuideList();
     }
 }
 
 const Data = {
-    routes: [],
-    guides: [],
     async getRoute() {
         try {
-            let url = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/${'routes'}`);
+            let url = new URL(`http://exam-2023-1-api.std-900.ist.mospolytech.ru/api/routes`);;
             url.searchParams.set("api_key", "64f8482f-218a-424a-bc2f-1eb33bd034fd");
             let response = await fetch(url);
             let routes = [];
@@ -101,27 +99,30 @@ const Data = {
 }
 
 const UI = {
-    selectors: {
-        routesTable: 'routeTableBody',
-        guidesTable: 'guideTable',
-        order: 'order',
-        guideSection: 'guide',
-        languageSelect: 'languages',
-        guideRouteHeader: '.guide-route',
-        paginator: '.pagination',
-        routeSearchForm: 'routes-form',
-        guideSearchForm: 'guide-form',
-        orderModal: '#orderModal',
-        objectSelect: 'objects'
-    },
     clearSelection(name) {
         let table = document.getElementById(name);
         for (let row of table.children) {
             row.classList.remove('table-secondary');
         }
+    },
+    displayReservation() {
+        let reservationSection = document.getElementById('order');
+        if (State.selectedRoute === undefined || State.selectedGuide === undefined) {
+            reservationSection.classList.add('hide');
+        } else {
+            reservationSection.classList.remove('hide');
+        }
+    },
+    dispErr(block, message) {
+        const div = document.createElement('div');
+        div.classList.add('alert', 'alert-danger');
+        div.textContent = message;
+        block.appendChild(div);
+        setTimeout(() => {
+            div.remove();
+        }, 5000);
     }
 }
-
 
 function setLanguage() {
     let items = JSON.parse(sessionStorage.getItem('guides'));
@@ -133,15 +134,6 @@ function setLanguage() {
         option.innerHTML = language;
         option.setAttribute("value", language);
         select.appendChild(option);
-    }
-}
-
-function displayReservation() {
-    let reservationSection = document.getElementById('order');
-    if (State.selectedRoute === undefined || State.selectedGuide === undefined) {
-        reservationSection.classList.add('hide');
-    } else {
-        reservationSection.classList.remove('hide');
     }
 }
 
@@ -293,16 +285,6 @@ function initializeObjectSelector() {
     }
 }
 
-function dispErr(block, message) {
-    const div = document.createElement('div');
-    div.classList.add('alert', 'alert-danger');
-    div.textContent = message;
-    block.appendChild(div);
-    setTimeout(() => {
-        div.remove();
-    }, 5000);
-}
-
 function getKbyDate(date) {
     const specialDates = ['2024-01-01', '2024-01-09', '2024-04-27', '2024-11-02', '2024-12-28'];
     const weekendDays = [6, 7];
@@ -327,12 +309,12 @@ function updateForm(dialog) {
     let errorContainer = dialog.target.querySelector('#modal-errors');
    
     if (!(selectedHour >= 9 && selectedHour <= 23 && (selectedMinutes == 0 || selectedMinutes == 30))) {
-        dispErr(errorContainer, 'Доступно только время с 9 до 23 часов, каждые 30 минут!');
+        UI.dispErr(errorContainer, 'Доступно только время с 9 до 23 часов, каждые 30 минут!');
         submitButton.classList.add('disabled');
         return;
     }
     if (chosenDate == '' || selectedTime == '') {
-        dispErr(errorContainer, 'Необходимо указать время и дату!');
+        UI.dispErr(errorContainer, 'Необходимо указать время и дату!');
         submitButton.classList.add('disabled');
         return;
     }
@@ -384,14 +366,14 @@ function setupFormSubmission(button, formDataValues) {
             orderUrl.searchParams.set("api_key", "64f8482f-218a-424a-bc2f-1eb33bd034fd");
             let response = await sendForm(orderUrl, form);
             if (!response.ok) {
-                dispErr(errorContainer, 'Ошибка сервера!');
+                UI.dispErr(errorContainer, 'Ошибка сервера!');
             } else {
                 document.querySelector('#modal-close').click();
                 button.classList.remove('disabled');
             }
         } catch (error) {
             console.error('Error submitting the form:', error);
-            dispErr(errorContainer, 'Ошибка при отправке заказа!');
+            UI.dispErr(errorContainer, 'Ошибка при отправке заказа!');
         }  
     };
 }
@@ -402,7 +384,6 @@ async function sendForm(url, formData) {
         body: formData
     });
 }
-
 
 window.onload = async () => {
     await Data.getRoute();
@@ -437,5 +418,5 @@ window.onload = async () => {
     event.target.querySelector('#date').onchange = () => updateForm(event);
     event.target.querySelector('#option1').onchange = () => updateForm(event);
     event.target.querySelector('#option2').onchange = () => updateForm(event);
-});
+    });
 }
