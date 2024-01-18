@@ -8,9 +8,11 @@ body {
 header {
     background-color:#bbd5a0;
 }
+
 main {
     flex-grow: 1;
 }
+
 .navbar-brand {
     background-color: #ce499d;
     border-radius: 5px;
@@ -27,9 +29,7 @@ footer {
     position: fixed;  
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3 {
     font-family: 'Helvetica', sans-serif;
     color: #8B4513;
 }
@@ -37,9 +37,7 @@ h3 {
 table {
     border-radius: 10px;
     overflow: hidden;
-    /* Скрывает содержимое, выходящее за пределы скругления */
 }
-
 
 table th {
     background-color: rgb(255, 134, 134) !important;

@@ -396,16 +396,16 @@ window.onload = async () => {
     };
 
     document.getElementById('orderModal').addEventListener('show.bs.modal', function (event) {
-    event.target.querySelector('#fullname').innerHTML = State.selectedGuide.name;
-    event.target.querySelector('#route-name').innerHTML = State.selectedRoute.name;
-    event.target.querySelector('#time').value = '09:00';
-    event.target.querySelector('#date').value = Date.now();
-    
-    event.target.querySelector('#duration').onchange = () => updateForm(event);
-    event.target.querySelector('#count').oninput = () => updateForm(event);
-    event.target.querySelector('#time').onchange = () => updateForm(event);
-    event.target.querySelector('#date').onchange = () => updateForm(event);
-    event.target.querySelector('#option1').onchange = () => updateForm(event);
-    event.target.querySelector('#option2').onchange = () => updateForm(event);
+        event.target.querySelector('#fullname').innerHTML = State.selectedGuide.name;
+        event.target.querySelector('#route-name').innerHTML = State.selectedRoute.name;
+        event.target.querySelector('#time').value = '09:00';
+        event.target.querySelector('#date').value = Date.now();
+        
+        event.target.querySelector('#duration').onchange = () => updateForm(event);
+        event.target.querySelector('#count').oninput = () => updateForm(event);
+        event.target.querySelector('#time').onchange = () => updateForm(event);
+        event.target.querySelector('#date').onchange = () => updateForm(event);
+        event.target.querySelector('#option1').onchange = () => updateForm(event);
+        event.target.querySelector('#option2').onchange = () => updateForm(event);
     });
 }
