@@ -53,14 +53,14 @@ footer {
     border: 5px solid #515151;
   }
 
-  .exmpl {
+.exmpl {
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
-  .exmpl img {
+.exmpl img {
     height: 100%;
     width: auto;
   }

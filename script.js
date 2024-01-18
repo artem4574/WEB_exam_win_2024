@@ -150,13 +150,7 @@ function renderGuideList() {
         if (State.selectedGuide !== undefined && guideItems[index].id === State.selectedGuide.id) {
             row.classList.add('table-secondary');
         }
-
-        let thumbnailCell = document.createElement('th');
-        let avatarIcon = document.createElement('i');
-        avatarIcon.classList.add('bi', 'bi-person-circle');
-        thumbnailCell.append(avatarIcon);
-        row.append(thumbnailCell);
-
+       
         let nameCell = document.createElement('th');
         nameCell.textContent = guideItems[index].name;
         row.append(nameCell);
@@ -223,12 +217,10 @@ function displayPagination(currentPage) {
     paginationContainer.append(createPageItem('Последняя страница', totalPages));
 }
 
-
 function retrievePathFromSession() {
     let cachedPaths = JSON.parse(sessionStorage.getItem('searched-routes'));
-    if (cachedPaths === null) {
+    if (cachedPaths === null)
         cachedPaths = JSON.parse(sessionStorage.getItem('routes'));
-    }
     return cachedPaths;
 }
 
@@ -285,15 +277,11 @@ function initializeObjectSelector() {
     }
 }
 
-function getKbyDate(date) {
-    const specialDates = ['2024-01-01', '2024-01-09', '2024-04-27', '2024-11-02', '2024-12-28'];
-    const weekendDays = [6, 7];
-    const holidayDates = ['2024-02-23', '2024-03-08', '2024-04-29', '2024-04-30', '2024-05-01', '2024-05-09',
-                           '2024-05-10', '2024-06-12', '2024-11-04', '2024-12-30', '2024-12-31'];
-    let checkDay = specialDates.includes(date) ||
-                   (new Date(date).getDay() === 6 && !holidayDates.includes(date)) ||
-                   weekendDays.includes(new Date(date).getDay());
-    return checkDay ? 1.5 : 1;
+function isWeekend(date) {
+    const weekendDays = [6, 0];
+    const holidayDates = ['2024-01-01', '2024-02-23', '2024-03-08', '2024-04-12', '2024-05-01', '2024-05-09', '2024-06-12', '2024-11-04', '2024-12-31'];
+    let checkDay = (holidayDates.includes(date)) || weekendDays.includes(new Date(date).getDay());
+    return checkDay;
 }
 
 function updateForm(dialog) {
@@ -319,12 +307,13 @@ function updateForm(dialog) {
         return;
     }
     
-    let holidayMultiplier = getKbyDate(chosenDate);
+    let holidayMultiplier = isWeekend(chosenDate) ? 1.5 : 1;
     let morningExtraCharge = (selectedHour >= 9 && selectedHour < 12) ? 400 : 0;
     let eveningExtraCharge = (selectedHour >= 20 && selectedHour < 23) ? 1000 : 0;
     let largeGroupExtraCharge = visitorCount < 5 ? 0 : visitorCount < 10 ? 1000 : 1500;
     let option1ExtraRate = additionalOption1 ? 0.3 : 0;
-    let option2ExtraRate = additionalOption2 ? (holidayMultiplier == 1.5) ? 0.25 : 0.3 : 0;
+    let option2ExtraRate = additionalOption2 ? ((holidayMultiplier === 1.5) ? 0.25 : 0.3) : 0;
+
     submitButton.classList.remove('disabled');
     let finalPrice = calculatePrice(State.selectedGuide.pricePerHour, timeSpan, holidayMultiplier, option1ExtraRate, option2ExtraRate, morningExtraCharge, eveningExtraCharge, largeGroupExtraCharge);
     dialog.target.querySelector('#price').textContent = finalPrice;
@@ -342,8 +331,8 @@ function updateForm(dialog) {
 }
 
 function calculatePrice(rate, duration, holidayRate, option1Rate, option2Rate, morningCharge, eveningCharge, groupCharge) {
-    let initialPrice = rate * duration * (1 + option1Rate + option2Rate + holidayRate);
-    let totalPrice = initialPrice + morningCharge + eveningCharge + groupCharge;
+    let initialPrice = rate * duration * holidayRate + morningCharge + eveningCharge + groupCharge;
+    let totalPrice = initialPrice * (1 + option1Rate + option2Rate);
     return Math.round(totalPrice);
 }
 
@@ -390,8 +379,8 @@ window.onload = async () => {
     initializeObjectSelector();
 
     let formRoutes = document.getElementById('routes-form');
-    formRoutes.onsubmit = (e) => {
-        e.preventDefault();
+    formRoutes.onsubmit = (event) => {
+        event.preventDefault();
         Actions.findRoute(formRoutes);
     };
 
@@ -401,8 +390,8 @@ window.onload = async () => {
     };
 
     let formGuide = document.getElementById('guide-form');
-    formGuide.onsubmit = (e) => {
-        e.preventDefault();
+    formGuide.onsubmit = (event) => {
+        event.preventDefault();
         Actions.findGuide(formGuide);
     };
 
